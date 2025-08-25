@@ -2,16 +2,13 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Travel Allowance of Sonatech Engineer</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="manifest" href="manifest.json">
+  <title>Travel Allowance of Engineer</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.19.3/xlsx.full.min.js"></script>
   <style>
     body {
       font-family: Arial, sans-serif;
       background: #f4f6f9;
       padding: 20px;
-      margin: 0;
     }
     h1 {
       text-align: center;
@@ -83,14 +80,14 @@
   <div class="container">
     <h1>Travel Allowance of Sonatech Engineer</h1>
     <form id="travelForm">
-      <input type="date" name="Date" required>
-      <input type="text" name="From" placeholder="From" required>
-      <input type="text" name="To" placeholder="To" required>
-      <input type="text" name="Purpose" placeholder="Purpose to Visit">
-      <input type="number" name="OUT STATION" placeholder="OUT STATION (₹)" min="0">
-      <input type="number" name="KM" placeholder="K.M" min="0">
-      <input type="text" name="CallId" placeholder="Call ID">
-      <input type="number" name="Advance" placeholder="Advance (₹)" min="0">
+      <input type="date" name="date" required>
+      <input type="text" name="from" placeholder="From" required>
+      <input type="text" name="to" placeholder="To" required>
+      <input type="text" name="purpose" placeholder="Purpose to Visit">
+      <input type="number" name="lunch" placeholder="Lunch (₹)" min="0">
+      <input type="number" name="km" placeholder="K.M" min="0">
+      <input type="text" name="callId" placeholder="Call ID">
+      <input type="number" name="advance" placeholder="Advance (₹)" min="0">
       <button type="submit">Add</button>
     </form>
 
@@ -128,6 +125,7 @@
     const form = document.getElementById("travelForm");
     const tableBody = document.querySelector("#travelTable tbody");
 
+    // Load saved entries from localStorage
     let entries = JSON.parse(localStorage.getItem("travel_entries")) || [];
     renderTable();
 
@@ -185,18 +183,22 @@
       document.getElementById("totalAdvance").textContent = totalAdvance;
     }
 
+    // ✅ Mobile-friendly Excel Export
     function exportExcel() {
       const ws = XLSX.utils.json_to_sheet(entries);
       const wb = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(wb, ws, "Travel Allowance");
-      XLSX.writeFile(wb, "TravelAllowance.xlsx");
-    }
 
-    // Register Service Worker for PWA
-    if ("serviceWorker" in navigator) {
-      navigator.serviceWorker.register("sw.js");
+      const wbout = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+      const blob = new Blob([wbout], { type: "application/octet-stream" });
+
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = "TravelAllowance.xlsx";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
     }
   </script>
 </body>
 </html>
-
